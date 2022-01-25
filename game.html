@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interagindo com o periferico</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0px;
+      padding: 0px;
+      border: 0px;
+    }
+
+    html,
+    body {
+      width: 100vw;
+      height: 100vh;
+    }
+
+    canvas {
+      border: 1px solid;
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      /* width: 600px;
+      height: 400px; */
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- <canvas width="600" height="400"></canvas> -->
+  <canvas width="700" height="480"></canvas>
+
+  <script>
+
+    function getRandomArbitrary(min, max) {
+      return Math.round(Math.random() * (max - min) + min);
+    }
+
+    const hexSymbols = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'];
+    const randomHexColor = ['#'];
+
+    const c = console.log;
+    const canva = document.querySelector('canvas');
+    const brushTool = canva.getContext('2d');
+
+    function getRandomHexColor() {
+
+      while (randomHexColor.length > 1)
+        randomHexColor.pop();
+
+      while (randomHexColor.length <= 6)
+        randomHexColor.push(hexSymbols[getRandomArbitrary(0, 15)]);
+
+      return randomHexColor.join('');
+    }
+
+    function getLimits() {
+      c('offsetWidth', canva.offsetWidth);
+      c('offsetHeight', canva.offsetHeight);
+
+      c('clientWidth', canva.clientWidth);
+      c('clientHeight', canva.clientHeight);
+
+      c('scrollWidth', canva.scrollWidth);
+      c('scrollHeight', canva.scrollHeight);
+
+      c('width', canva.width);
+      c('height', canva.height);
+    }
+
+    function drawCircle(x, y, raio, cor) {
+
+      brushTool.fillStyle = cor;
+      brushTool.beginPath();
+      brushTool.arc(x, y, raio, 0, 7);
+      brushTool.fill();
+    }
+
+    // brushTool.fillStyle = 'blue';
+    brushTool.fillStyle = 'white';
+    brushTool.fillRect(0, 0, canva.width, canva.height);
+
+    const raio = 15;
+    const secondCircle = raio * 2;
+    const thirdCircle = raio * 3;
+
+    const leftKey = 37;
+    const upKey = 38;
+    const rightKey = 39;
+    const downKey = 40;
+
+    const arcShotRange = secondCircle; //mudar
+    let xSteps = 1;
+    let ySteps = 1;
+
+    let posX = getRandomArbitrary(thirdCircle, canva.width - thirdCircle);
+    let posY = getRandomArbitrary(thirdCircle, canva.height - thirdCircle);
+
+    // let increasePosX = true;
+    // let increasePosY = true;
+
+    const widthMaxLimit = canva.width - thirdCircle;
+    const heightMaxLimit = canva.height - thirdCircle;
+
+    function drawBase(x, y, w, h, cor) {
+      brushTool.fillStyle = cor;
+      brushTool.fillRect(x, y, w, h);
+    }
+
+    function runBall() {
+
+      drawCircle(posX, posY, thirdCircle + 1, 'white');
+
+      if (posX > widthMaxLimit || posX < thirdCircle) {
+        color = getRandomHexColor();
+        xSteps = -xSteps;
+      }
+
+      if (posY > heightMaxLimit || posY < thirdCircle) {
+        color = getRandomHexColor();
+        ySteps = -ySteps;
+      }
+
+      posX += xSteps;
+      posY += ySteps;
+
+      drawCircle(posX, posY, thirdCircle, color); // maior círculo
+      drawCircle(posX, posY, secondCircle, 'white');
+      drawCircle(posX, posY, raio, color); // menor circulo
+    }
+
+    canva.onclick = e => {
+
+      if (e.offsetX > posX - arcShotRange && e.offsetX < posX + arcShotRange && e.offsetY > posY - arcShotRange && e.offsetY < posY + arcShotRange) {
+        c(e);
+        alert("Acertou mizeravi!!!");
+      }
+
+    }
+
+    const interval = setInterval(runBall, 1);
+    let yBaseSteps = 5;
+    let yBasePos = 10;
+
+    function runBase() {
+      drawBase(xPosBase, yBasePos, widthBase, heightBase, 'white');
+
+      if (yBasePos < canva.height - heightBase - 10 && yBasePos > 9 ) {
+        // color = getRandomHexColor();
+        yBasePos += yBaseSteps;
+      }
+
+      drawBase(xPosBase, yBasePos, widthBase, heightBase, baseColor);
+    }
+
+    const xPosBase = 10;
+    const widthBase = 15;
+    const heightBase = 60;
+
+    
+
+    // Start y Pos
+    let baseColor = 'blue';
+    let counterDiscount = 1;
+
+    drawBase(xPosBase, yBasePos, widthBase, heightBase, baseColor);
+
+    document.onkeydown = e => {
+
+      baseMoveInterval = setInterval(runBase, 1);
+
+      // Ivert signal logic is here.
+      if (e.keyCode == upKey && yBaseSteps > 0)
+      {
+        yBaseSteps = yBaseSteps * -1;
+        yBasePos--;
+      }
+
+      if (e.keyCode == downKey && yBaseSteps < 0)
+      {
+        yBaseSteps = yBaseSteps * -1;
+        yBasePos++;
+      }
+    }
+
+    document.onkeyup = e => {
+
+      if (e.keyCode == upKey || e.keyCode == downKey)
+        clearInterval(baseMoveInterval);
+        //ss
+    }
+    let baseMoveInterval;
+
+  </script>
+</body>
+
+</html>
