@@ -10,14 +10,12 @@ function runBall() {
 
   drawCircle(brushTool, xBallPos, yBallPos, radiusClear, 'white');
 
-  if (xBallPos > widthMaxLimit || xBallPos < radius) 
-  {
+  if (xBallPos > widthMaxLimit || xBallPos < radius) {
     xBallSteps = -xBallSteps;
     // ballColor = getRandomHexColor();
   }
 
-  if (yBallPos > heightMaxLimit || yBallPos < radius) 
-  {
+  if (yBallPos > heightMaxLimit || yBallPos < radius) {
     yBallSteps = -yBallSteps;
     // ballColor = getRandomHexColor();
   }
@@ -42,10 +40,9 @@ let baseMoveInterval;
 */
 
 function runBase() {
-  drawBase(brushTool, xPosBase, yBasePos, widthBase, heightBase, 'white');
+  drawBase(brushTool, xPosBase, yBasePos, widthBase, heightBase + 10, 'white');
 
-  if (yBasePos >= 10 && yBasePos < yBallMaxPos) 
-  {
+  if (yBasePos >= 10 && yBasePos < yBallMaxPos) {
     yBasePos += yBaseSteps;
   }
   drawBase(brushTool, xPosBase, yBasePos, widthBase, heightBase, baseColor);
@@ -56,14 +53,14 @@ document.onkeydown = e => {
   baseMoveInterval = setInterval(runBase, 10);
 
   // Ivert signal logic is here.
-  if (e.keyCode == upKey && yBaseSteps < 0) {
-    yBaseSteps *= -1;
-    // yBasePos--;
+  if (e.keyCode == upKey && yBaseSteps > 0) {
+    yBaseSteps = yBaseSteps * -1;
+    yBasePos--;
   }
 
-  if (e.keyCode == downKey && yBaseSteps > 0) {
-    yBaseSteps *= -1;
-    // yBasePos++;
+  if (e.keyCode == downKey && yBaseSteps < 0) {
+    yBaseSteps = yBaseSteps * -1;
+    yBasePos++;
   }
 }
 
@@ -117,8 +114,8 @@ const interval = setInterval(runBall, 10);
 
 
 /////////////////////////// BASE VALUES
-let yBasePos = 10;
-let yBaseStartPos = 50;
+let yBasePos = canva.height / 2 - 65 / 2;
+// let yBaseStartPos = 50;
 let yBaseSteps = 1;
 let baseColor = 'red';
 let baseMoveInterval;
@@ -126,11 +123,11 @@ let baseMoveInterval;
 const widthBase = 15;
 const heightBase = 65;
 const xPosBase = 10;
-const yBallMaxPos = canva.height - heightBase - yBasePos;
+const yBallMaxPos = canva.height - heightBase - 10;
 /////////////////////////// BASE VALUES
 
 /////////////////////////// BASE INITIAL POSITION
-drawBase(brushTool, xPosBase, yBaseStartPos, widthBase, heightBase, baseColor);
+drawBase(brushTool, xPosBase, yBasePos, widthBase, heightBase, baseColor);
 /////////////////////////// BASE INITIAL POSITION
 
 
