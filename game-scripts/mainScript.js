@@ -5,41 +5,13 @@ import { getCanvasLimit } from '../functions/getCanvasLimit.js';
 import { drawCircle } from './drawCircle.js';
 import { drawRacket } from './drawRacket.js';
 
-function runBall() {
-  drawCircle(brushTool, xBallPos, yBallPos, ballRadius + 1, 'white');
-
-  if (xBallPos > xBallMaxLimit || xBallPos < ballRadius) {
-    xBallSteps = -xBallSteps;
-  }
-
-  if (yBallPos > yBallMaxLimit || yBallPos < ballRadius) {
-    yBallSteps = -yBallSteps;
-  }
-
-  xBallPos += xBallSteps;
-  yBallPos += yBallSteps;
-
-  drawCircle(brushTool, xBallPos, yBallPos, ballRadius, 'red'); // menor circulo
+function clear(){
+  brushTool.fillStyle = "white";
+  brushTool.fillRect(0, 0, canva.width, canva.height)
 }
-
-function runRacket() {
-  if (!runRacketFlag) return;
-
-  drawRacket(
-    brushTool,
-    xRacketPos,
-    yRacketPos,
-    racketWidth,
-    racketHeight,
-    'white'
-  );
-
-  if (yRacketPos <= 10) {
-    yRacketPos++;
-  } else if (yRacketPos >= yRacketLimit) {
-    yRacketPos--;
-  } else yRacketPos += yRacketSteps;
-
+function render() { //responsavel por renderizar o layout
+  clear()
+  drawCircle(brushTool, xBallPos, yBallPos, ballRadius, 'red');
   drawRacket(
     brushTool,
     xRacketPos,
@@ -50,17 +22,100 @@ function runRacket() {
   );
 }
 
-document.onkeydown = (e) => {
-  if (e.keyCode == upKey && yRacketSteps > 0) {
-    yRacketSteps *= -1;
-  } else if (e.keyCode == downKey && yRacketSteps < 0) {
-    yRacketSteps *= -1;
+function moveBall() { //resposavel por movimentar a bola
+  if (xBallPos > xBallMaxLimit || xBallPos < ballRadius) {
+    xBallSteps = -xBallSteps;
   }
-  runRacketFlag = true;
+  if (yBallPos > yBallMaxLimit || yBallPos < ballRadius) {
+    yBallSteps = -yBallSteps;
+  }
+  xBallPos += xBallSteps;
+  yBallPos += yBallSteps;
+}
+
+function moveRacket() { //responsavel por movimentar a racket
+  if (runRacketFlag) {
+    console.log("movimentand")
+    if (yRacketPos <= 10) {
+      yRacketPos++;
+    } else if (yRacketPos >= yRacketLimit) {
+      yRacketPos--;
+    } else yRacketPos += yRacketSteps;
+  }
+}
+
+// function runBall() {
+//   drawCircle(brushTool, xBallPos, yBallPos, ballRadius + 1, 'white');
+//   if (xBallPos > xBallMaxLimit || xBallPos < ballRadius) {
+//     xBallSteps = -xBallSteps;
+//   }
+//   if (yBallPos > yBallMaxLimit || yBallPos < ballRadius) {
+//     yBallSteps = -yBallSteps;
+//   }
+//   xBallPos += xBallSteps;
+//   yBallPos += yBallSteps;
+//   drawCircle(brushTool, xBallPos, yBallPos, ballRadius, 'red'); // menor circulo
+// }
+
+// function runRacket() {
+//   if (runRacketFlag) {
+//     drawRacket(
+//       brushTool,
+//       xRacketPos,
+//       yRacketPos,
+//       racketWidth,
+//       racketHeight,
+//       'white'
+//     );
+//     if (yRacketPos <= 10) {
+//       yRacketPos++;
+//     } else if (yRacketPos >= yRacketLimit) {
+//       yRacketPos--;
+//     } else yRacketPos += yRacketSteps;
+  
+//     drawRacket(
+//       brushTool,
+//       xRacketPos,
+//       yRacketPos,
+//       racketWidth,
+//       racketHeight,
+//       racketColor
+//     );
+//   }
+
+// }
+
+document.onkeydown = (e) => {
+
+  if (e.key == "ArrowUp" && runRacketFlag == false) { //tem como utilizar o nome da tecla precionada para executar uma ação
+
+    if (yRacketSteps > 0) { //passada essa condição para dentro para não causar bug ao soltar a tecla
+      yRacketSteps *= -1;
+    }
+    
+    runRacketFlag = true;
+    keyPress = e.key //Serve para verificar se a tecla que foi solta é igual a que está em movimento
+
+  } 
+  else if (e.key == "ArrowDown" && runRacketFlag == false) {
+
+    if (yRacketSteps < 0) { //passada essa condição para dentro para não causar bug ao soltar a tecla
+      yRacketSteps *= -1;
+    }
+
+    runRacketFlag = true;
+    keyPress = e.key //Serve para verificar se a tecla que foi solta é igual a que está em movimento
+  }
+
 };
 
 document.onkeyup = (e) => {
-  runRacketFlag = false;
+
+  if (e.key == keyPress) { //Não deixa desativar a tecla precionada e parar a Racket
+    runRacketFlag = false;
+    keyPress = null
+  }
+  
 };
 
 const canva = document.querySelector('canvas');
@@ -88,21 +143,26 @@ const yRacketLimit = canva.height - racketHeight - 10;
 
 let yRacketPos = canva.height / 2 - racketHeight / 2;
 let runRacketFlag = false;
+let keyPress = null //Serve para verificar se a tecla que foi solta é igual a que está em movimento
 let yRacketSteps = 2;
 
-brushTool.fillStyle = 'white';
-brushTool.fillRect(0, 0, canva.width, canva.height);
+// brushTool.fillStyle = 'white';
+// brushTool.fillRect(0, 0, canva.width, canva.height);
 
-drawRacket(
-  brushTool,
-  xRacketPos,
-  yRacketPos,
-  racketWidth,
-  racketHeight,
-  racketColor
-);
+// drawRacket(
+//   brushTool,
+//   xRacketPos,
+//   yRacketPos,
+//   racketWidth,
+//   racketHeight,
+//   racketColor
+// );
 
-drawCircle(brushTool, xBallPos, yBallPos, ballRadius, 'red');
+// drawCircle(brushTool, xBallPos, yBallPos, ballRadius, 'red');
 
-const ballRunInterval = setInterval(runBall, 8);
-const racketRunInterval = setInterval(runRacket, 1);
+// const ballRunInterval = setInterval(runBall, 8);
+// const racketRunInterval = setInterval(runRacket, 1);
+
+const renderRunInterval = setInterval(render, 1)
+const moveBallRunInterval = setInterval(moveBall, 8);
+const moveRacketRunInterval = setInterval(moveRacket, 4);
