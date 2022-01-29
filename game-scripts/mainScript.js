@@ -3,132 +3,106 @@ import { getRandomHexColor } from '../functions/getRandomHexColor.js';
 import { getCanvasLimit } from '../functions/getCanvasLimit.js';
 
 import { drawCircle } from './drawCircle.js';
-import { drawBase } from './drawBase.js';
-
+import { drawRacket } from './drawRacket.js';
 
 function runBall() {
+  drawCircle(brushTool, xBallPos, yBallPos, ballRadius + 1, 'white');
 
-  drawCircle(brushTool, xBallPos, yBallPos, radiusClear, 'white');
-
-  if (xBallPos > widthMaxLimit || xBallPos < radius) {
+  if (xBallPos > xBallMaxLimit || xBallPos < ballRadius) {
     xBallSteps = -xBallSteps;
-    // ballColor = getRandomHexColor();
   }
 
-  if (yBallPos > heightMaxLimit || yBallPos < radius) {
+  if (yBallPos > yBallMaxLimit || yBallPos < ballRadius) {
     yBallSteps = -yBallSteps;
-    // ballColor = getRandomHexColor();
   }
 
   xBallPos += xBallSteps;
   yBallPos += yBallSteps;
 
-  drawCircle(brushTool, xBallPos, yBallPos, radius, ballColor);
+  drawCircle(brushTool, xBallPos, yBallPos, ballRadius, 'red'); // menor circulo
 }
 
+function runRacket() {
+  if (!runRacketFlag) return;
 
+  drawRacket(
+    brushTool,
+    xRacketPos,
+    yRacketPos,
+    racketWidth,
+    racketHeight,
+    'white'
+  );
 
-/*
-const widthBase = 15;
-const heightBase = 65;
-const xPosBase = 10;
+  if (yRacketPos <= 10) {
+    yRacketPos++;
+  } else if (yRacketPos >= yRacketLimit) {
+    yRacketPos--;
+  } else yRacketPos += yRacketSteps;
 
-let yBasePos = 10;
-let yBaseSteps = 1;
-let baseColor = 'red';
-let baseMoveInterval;
-*/
+  drawRacket(
+    brushTool,
+    xRacketPos,
+    yRacketPos,
+    racketWidth,
+    racketHeight,
+    racketColor
+  );
+}
 
-function runBase() {
-  drawBase(brushTool, xPosBase, yBasePos, widthBase, heightBase + 10, 'white');
-
-  if (yBasePos >= 10 && yBasePos < yBallMaxPos) {
-    yBasePos += yBaseSteps;
+document.onkeydown = (e) => {
+  if (e.keyCode == upKey && yRacketSteps > 0) {
+    yRacketSteps *= -1;
+  } else if (e.keyCode == downKey && yRacketSteps < 0) {
+    yRacketSteps *= -1;
   }
-  drawBase(brushTool, xPosBase, yBasePos, widthBase, heightBase, baseColor);
-}
+  runRacketFlag = true;
+};
 
-document.onkeydown = e => {
+document.onkeyup = (e) => {
+  runRacketFlag = false;
+};
 
-  baseMoveInterval = setInterval(runBase, 10);
+const canva = document.querySelector('canvas');
+const brushTool = canva.getContext('2d');
 
-  // Ivert signal logic is here.
-  if (e.keyCode == upKey && yBaseSteps > 0) {
-    yBaseSteps = yBaseSteps * -1;
-    yBasePos--;
-  }
-
-  if (e.keyCode == downKey && yBaseSteps < 0) {
-    yBaseSteps = yBaseSteps * -1;
-    yBasePos++;
-  }
-}
-
-document.onkeyup = e => {
-
-  if (e.keyCode == upKey || e.keyCode == downKey)
-    clearInterval(baseMoveInterval);
-}
-
-// Keys variables
 const leftKey = 37;
 const upKey = 38;
 const rightKey = 39;
 const downKey = 40;
 
-// Canvas variables
-const canva = document.querySelector('canvas');
-const brushTool = canva.getContext('2d');
+const ballRadius = 15;
+const xBallMaxLimit = canva.width - ballRadius;
+const yBallMaxLimit = canva.height - ballRadius;
 
-
-/////////////////////////// BALL VALUES
-// Ball variables
-const radius = 15;
-const radiusClear = radius + 1;
-const widthMaxLimit = canva.width - radius;
-const heightMaxLimit = canva.height - radius;
-
-let ballColor = 'blue';
+let xBallPos = canva.width / 2;
+let yBallPos = canva.height / 2;
 let xBallSteps = 2;
 let yBallSteps = 1;
-let xBallPos = getRandomArbitrary(radius, canva.width - radius);
-let yBallPos = getRandomArbitrary(radius, canva.height - radius);
-/////////////////////////// BALL VALUES
 
+const racketColor = 'blue';
+const racketWidth = 15;
+const racketHeight = 60;
+const xRacketPos = 10;    //fixa
+const yRacketLimit = canva.height - racketHeight - 10;
 
-/////////////////////////// CANVAS CONSTRUCTOR
+let yRacketPos = canva.height / 2 - racketHeight / 2;
+let runRacketFlag = false;
+let yRacketSteps = 2;
+
 brushTool.fillStyle = 'white';
 brushTool.fillRect(0, 0, canva.width, canva.height);
-/////////////////////////// CANVAS CONSTRUCTOR
 
+drawRacket(
+  brushTool,
+  xRacketPos,
+  yRacketPos,
+  racketWidth,
+  racketHeight,
+  racketColor
+);
 
-/////////////////////////// BALL INITIAL POSITION
-drawCircle(brushTool, xBallPos, yBallPos, radius, ballColor);
-/////////////////////////// BALL INITIAL POSITION
+drawCircle(brushTool, xBallPos, yBallPos, ballRadius, 'red');
 
-
-/////////////////////////// RUN BALL
-const interval = setInterval(runBall, 10);
-/////////////////////////// RUN BALL
-
-
-
-/////////////////////////// BASE VALUES
-let yBasePos = canva.height / 2 - 65 / 2;
-// let yBaseStartPos = 50;
-let yBaseSteps = 1;
-let baseColor = 'red';
-let baseMoveInterval;
-
-const widthBase = 15;
-const heightBase = 65;
-const xPosBase = 10;
-const yBallMaxPos = canva.height - heightBase - 10;
-/////////////////////////// BASE VALUES
-
-/////////////////////////// BASE INITIAL POSITION
-drawBase(brushTool, xPosBase, yBasePos, widthBase, heightBase, baseColor);
-/////////////////////////// BASE INITIAL POSITION
-
-
-
+const ballRunInterval = setInterval(runBall, 8);
+const racketRunInterval = setInterval(runRacket, 1);
