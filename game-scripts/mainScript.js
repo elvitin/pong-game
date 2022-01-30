@@ -31,8 +31,15 @@ function moveBall() { //resposavel por movimentar a bola
     const finalY = inicioY + 60
     // ------------------------------------------
 
-    if (xBallPos == posicaoX && yBallPos >= inicioY && yBallPos <= finalY) {
+    if (xBallPos == posicaoX && yBallPos >= inicioY && yBallPos <= finalY && toque == false) {
         xBallSteps =- xBallSteps;
+    }
+    
+    if (xBallPos < posicaoX) {
+        toque = true
+    }
+    else if (xBallPos > posicaoX) {
+        toque = false
     }
     if (xBallPos > xBallMaxLimit || xBallPos < ballRadius) {
         xBallSteps =- xBallSteps;
@@ -45,7 +52,6 @@ function moveBall() { //resposavel por movimentar a bola
 }
 
 function moveRacket() { //responsavel por movimentar a racket
-    console.log("Movendo hackete")
     if (runRacketFlag) {
         if (yRacketPos <= 10) {
             yRacketPos++;
@@ -102,10 +108,9 @@ const yRacketLimit = canva.height - racketHeight - 10;
 let moveRacketRunInterval = false
 
 let yRacketPos = canva.height / 2 - racketHeight / 2;
-console.log(yRacketPos)
 let runRacketFlag = false;
 let keyPress = null //Serve para verificar se a tecla que foi solta é igual a que está em movimento
 let yRacketSteps = 2;
-
+let toque = false
 const renderRunInterval = setInterval(render)
 const moveBallRunInterval = setInterval(moveBall, 8);
