@@ -24,12 +24,13 @@ function render() { //responsavel por renderizar o layout
 }
 
 function moveBall() { //resposavel por movimentar a bola
-
+    
     //Calculo posição Racket
     const posicaoX = xRacketPos + racketWidth + ballRadius
     const inicioY = yRacketPos
     const finalY = inicioY + 60
     // ------------------------------------------
+
     if (xBallPos == posicaoX && yBallPos >= inicioY && yBallPos <= finalY) {
         xBallSteps =- xBallSteps;
     }
